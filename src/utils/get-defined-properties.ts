@@ -1,5 +1,5 @@
 import { UpdatePartyDataDto, UpdatePartyDto } from "../dtos";
-import { PoliticalParty } from "../interfaces/store.interfaces";
+import { PoliticalParty } from "../interfaces";
 
 export const getDefinedProperties = (partyProperties: UpdatePartyDataDto) => {
   const partialParty: Record<string, any> = {};

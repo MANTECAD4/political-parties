@@ -1,6 +1,6 @@
 import { WebSocketServer as WsServer, WebSocket } from "ws";
-import { WebSocketResponseType } from "./interfaces/responses.interface";
-import { PartiesController } from "./handlers/parties-controller";
+import { WebSocketResponseType } from "./interfaces/";
+import { PartiesService } from "./services/parties.service";
 import { IncomingMessage } from "http";
 
 export interface OptionsWss {
@@ -11,7 +11,7 @@ export interface OptionsWss {
 
 export class WebSocketServer {
   private wss: WsServer;
-  private partiesController = new PartiesController();
+  private partiesService = new PartiesService();
   private channels: Map<string, Set<WebSocket>> = new Map();
   public defaultChannel: string;
   public port: number;
@@ -23,7 +23,7 @@ export class WebSocketServer {
     this.wss = new WsServer({ path, port });
   }
 
-  public sendEvent = (type: string, payload: any) => {
+  private sendEvent = (type: string, payload: any) => {
     this.wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify({ type, payload }));
@@ -48,14 +48,12 @@ export class WebSocketServer {
     return channelId;
   };
 
-  public start = () => {
-    console.log(`Server is running on port ${this.port}`);
-
+  private configureServer = () => {
     this.wss.on("connection", (ws: WebSocket, req) => {
       const channelId = this.registerUser(ws, req);
 
       // Send current parties on connection opening
-      const parties = JSON.stringify(this.partiesController.handleGetParties());
+      const parties = JSON.stringify(this.partiesService.handleGetParties());
       ws.send(parties);
 
       ws.on("close", () => {
@@ -63,8 +61,7 @@ export class WebSocketServer {
       });
 
       ws.on("message", (rawRequestMessage: string) => {
-        const response =
-          this.partiesController.handleMessage(rawRequestMessage);
+        const response = this.partiesService.handleMessage(rawRequestMessage);
 
         const responseStringify = JSON.stringify(response);
         if (
@@ -76,10 +73,17 @@ export class WebSocketServer {
         const clientsInChannel = this.channels.get(channelId);
         clientsInChannel!.forEach((client) => {
           // if (ws.id !== client.id) {
-          client.send(responseStringify);
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(responseStringify);
+          }
           // }
         });
       });
     });
+  };
+
+  public start = () => {
+    console.log(`Server is running on port ${this.port}`);
+    this.configureServer();
   };
 }

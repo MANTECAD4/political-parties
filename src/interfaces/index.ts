@@ -1,3 +1,11 @@
+export interface PoliticalParty {
+  id: string;
+  name: string;
+  fill: string;
+  votes: number;
+}
+
+// !! Responses
 export type WebSocketResponse =
   | WebSocketError
   | {
@@ -9,10 +17,7 @@ export enum WebSocketResponseType {
   PARTIES_LIST = "PARTIES_LIST",
   PARTY_ADDED = "PARTY_ADDED",
   PARTY_UPDATED = "PARTY_UPDATED",
-  PARTY_INCREMENTED = "PARTY_INCREMENTED",
-  PARTY_DECREMENTED = "PARTY_DECREMENTED",
   PARTY_DELETED = "PARTY_DELETED",
-  VOTES_UPDATED = "VOTES_UPDATED",
   ERROR = "ERROR",
 }
 export interface WebSocketError {
@@ -20,4 +25,17 @@ export interface WebSocketError {
   payload: {
     error: string;
   };
+}
+
+//!!Requests
+export interface WebSocketRequest {
+  type: WebSocketRequestType;
+  payload: unknown;
+}
+
+export enum WebSocketRequestType {
+  GET_PARTIES = "GET_PARTIES",
+  ADD_PARTY = "ADD_PARTY",
+  UPDATE_PARTY = "UPDATE_PARTY",
+  DELETE_PARTY = "DELETE_PARTY",
 }

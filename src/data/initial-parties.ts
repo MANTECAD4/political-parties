@@ -1,4 +1,4 @@
-import { PoliticalParty } from "../interfaces/store.interfaces";
+import { PoliticalParty } from "../interfaces";
 
 const defaultParties: PoliticalParty[] = [
   {

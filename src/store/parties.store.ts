@@ -1,6 +1,6 @@
 import { createDefaultParties } from "../data/initial-parties";
 import { UpdatePartyDataDto, UpdatePartyDto } from "../dtos";
-import { PoliticalParty } from "../interfaces/store.interfaces";
+import { PoliticalParty } from "../interfaces";
 import { getDefinedProperties } from "../utils/get-defined-properties";
 
 export class PartiesStore {
@@ -21,16 +21,12 @@ export class PartiesStore {
 
   public update = (
     id: string,
-    partyProperties: UpdatePartyDataDto,
+    updatedPartyProperties: Record<string, any>,
   ): PoliticalParty => {
-    const validProperties = getDefinedProperties(partyProperties);
+    const prevPartyStatus = this.findById(id);
 
-    const prevPartyStatus = this.parties.find((party) => party.id === id);
-    if (Object.values(validProperties).length === 0)
-      throw new Error("At least one property is required for update");
     if (!prevPartyStatus) throw new Error("Referenced party not found");
-
-    const updatedParty = { ...prevPartyStatus, ...validProperties };
+    const updatedParty = { ...prevPartyStatus, ...updatedPartyProperties };
 
     this.parties = this.parties.map((party) => {
       if (party.id === id) {
@@ -42,37 +38,6 @@ export class PartiesStore {
     return updatedParty;
   };
 
-  public increment = (id: string): PoliticalParty => {
-    const prevPartyState = this.parties.find((party) => party.id === id);
-    if (!prevPartyState) throw new Error("party not found");
-    const newPartyStatus = {
-      ...prevPartyState,
-      votes: prevPartyState.votes + 1,
-    };
-    this.parties = this.parties.map((party) => {
-      if (party.id === id) {
-        return newPartyStatus;
-      }
-      return party;
-    });
-    return newPartyStatus;
-  };
-  public decrement = (id: string): PoliticalParty => {
-    const prevPartyState = this.parties.find((party) => party.id === id);
-    if (!prevPartyState) throw new Error("party not found");
-    const newPartyStatus = {
-      ...prevPartyState,
-      votes: prevPartyState.votes < 1 ? 0 : prevPartyState.votes - 1,
-    };
-    this.parties = this.parties.map((party) => {
-      if (party.id === id) {
-        return newPartyStatus;
-      }
-      return party;
-    });
-
-    return newPartyStatus;
-  };
   public remove = (id: string): PoliticalParty => {
     const party = this.findById(id);
     if (!party) throw new Error("Party not found");
@@ -86,3 +51,35 @@ export class PartiesStore {
     return;
   };
 }
+
+// public increment = (id: string): PoliticalParty => {
+//   const prevPartyState = this.parties.find((party) => party.id === id);
+//   if (!prevPartyState) throw new Error("party not found");
+//   const newPartyStatus = {
+//     ...prevPartyState,
+//     votes: prevPartyState.votes + 1,
+//   };
+//   this.parties = this.parties.map((party) => {
+//     if (party.id === id) {
+//       return newPartyStatus;
+//     }
+//     return party;
+//   });
+//   return newPartyStatus;
+// };
+// public decrement = (id: string): PoliticalParty => {
+//   const prevPartyState = this.parties.find((party) => party.id === id);
+//   if (!prevPartyState) throw new Error("party not found");
+//   const newPartyStatus = {
+//     ...prevPartyState,
+//     votes: prevPartyState.votes < 1 ? 0 : prevPartyState.votes - 1,
+//   };
+//   this.parties = this.parties.map((party) => {
+//     if (party.id === id) {
+//       return newPartyStatus;
+//     }
+//     return party;
+//   });
+
+//   return newPartyStatus;
+// };
