@@ -7,8 +7,14 @@ import {
   WebSocketResponseType,
 } from "../interfaces/responses.interface";
 import { PartiesStore } from "../store/parties.store";
-import { AddPartySchema, WithIdSchema } from "../dtos";
+import {
+  AddPartySchema,
+  UpdatePartyDto,
+  UpdatePartySchema,
+  WithIdSchema,
+} from "../dtos";
 import { PoliticalParty } from "../interfaces/store.interfaces";
+import z from "zod";
 
 export class PartiesController {
   private readonly partiesStore = new PartiesStore();
@@ -21,7 +27,7 @@ export class PartiesController {
         case WebSocketRequestType.ADD_PARTY:
           return this.handleAddParty(jsonMessage.payload);
         case WebSocketRequestType.UPDATE_PARTY:
-          return this.handleUpdateParty(jsonMessage.payload);
+          return this.handleUpdateParty(jsonMessage.payload as UpdatePartyDto);
         case WebSocketRequestType.INCREMENT_PARTY:
           return this.handleIncrementParty(jsonMessage.payload);
         case WebSocketRequestType.DECREMENT_PARTY:
@@ -30,7 +36,7 @@ export class PartiesController {
           return this.handleDeleteParty(jsonMessage.payload);
         case WebSocketRequestType.UPDATE_VOTES:
           return this.handleUpdateVotes(jsonMessage.payload);
-        case WebSocketRequestType.PARTIES_LIST:
+        case WebSocketRequestType.GET_PARTIES:
           console.log("parties list");
           return this.handleGetParties();
 
@@ -38,11 +44,13 @@ export class PartiesController {
           throw new Error("Unrecognized request code");
       }
     } catch (error) {
-      return this.handleError("Invalid request message");
+      return this.handleError(
+        (error as any).message ?? "Invalid request message",
+      );
     }
   };
 
-  private handleGetParties = (): WebSocketResponse => {
+  public handleGetParties = (): WebSocketResponse => {
     const parties = this.partiesStore.getAll();
     return {
       type: WebSocketResponseType.PARTIES_LIST,
@@ -96,10 +104,19 @@ export class PartiesController {
     };
   };
 
-  private handleUpdateParty = (payload: unknown): WebSocketResponse => ({
-    type: WebSocketResponseType.PARTY_UPDATED,
-    payload,
-  });
+  private handleUpdateParty = (payload: UpdatePartyDto): WebSocketResponse => {
+    console.log({ payload });
+    const { data: checkedParty, error } = UpdatePartySchema.safeParse(payload);
+    if (error) throw new Error(JSON.stringify(z.treeifyError(error)));
+    const updatedParty = this.partiesStore.update(
+      checkedParty.id,
+      checkedParty.data,
+    );
+    return {
+      type: WebSocketResponseType.PARTY_UPDATED,
+      payload: { party: updatedParty },
+    };
+  };
   private handleUpdateVotes = (payload: unknown): WebSocketResponse => ({
     type: WebSocketResponseType.VOTES_UPDATED,
     payload,

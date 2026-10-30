@@ -1,7 +1,6 @@
 export interface PoliticalParty {
   id: string;
   name: string;
-  color: string;
-  borderColor: string;
+  fill: string;
   votes: number;
 }

@@ -1,44 +1,26 @@
 import { PoliticalParty } from "../interfaces/store.interfaces";
 
-const defaultParties = [
+const defaultParties: PoliticalParty[] = [
   {
+    id: crypto.randomUUID(),
     name: "Partido Rojo",
-    color: "rgba(220, 53, 69, 0.2)",
-    borderColor: "rgb(220, 53, 69)",
-    votes: 42,
+    fill: "red",
+    votes: 12,
   },
   {
-    name: "Partido Azul",
-    color: "rgba(0, 123, 255, 0.2)",
-    borderColor: "rgb(0, 123, 255)",
-    votes: 40,
-  },
-  {
+    id: crypto.randomUUID(),
     name: "Partido Verde",
-    color: "rgba(40, 167, 69, 0.2)",
-    borderColor: "rgb(40, 167, 69)",
-    votes: 28,
+    fill: "green",
+    votes: 6,
   },
   {
-    name: "Partido Amarillo",
-    color: "rgba(255, 193, 7, 0.2)",
-    borderColor: "rgb(255, 193, 7)",
-    votes: 23,
-  },
-  {
-    name: "Partido Naranja",
-    color: "rgba(255, 152, 0, 0.2)",
-    borderColor: "rgb(255, 152, 0)",
-    votes: 15,
+    id: crypto.randomUUID(),
+    name: "Partido Azul",
+    fill: "blue",
+    votes: 7,
   },
 ];
 
-export const createDefaultParties = (): Record<string, PoliticalParty> => {
-  const partiesWithId = defaultParties.map((party) => ({
-    ...party,
-    id: crypto.randomUUID(),
-  }));
-  const parties: Record<string, PoliticalParty> = {};
-  partiesWithId.forEach((party) => (parties[party.id] = party));
-  return parties;
+export const createDefaultParties = (): PoliticalParty[] => {
+  return defaultParties;
 };

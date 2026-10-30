@@ -4,7 +4,7 @@ export interface WebSocketRequest {
 }
 
 export enum WebSocketRequestType {
-  PARTIES_LIST = "PARTIES_LIST",
+  GET_PARTIES = "GET_PARTIES",
   ADD_PARTY = "ADD_PARTY",
   UPDATE_PARTY = "UPDATE_PARTY",
   INCREMENT_PARTY = "INCREMENT_PARTY",
